@@ -5,7 +5,7 @@ le Projet : on développe le jeu Skull en ligne avec des web services Spring Boo
 ## L'équipe
 
 | Membre | Partie |
-|---|---|---|
+|---|---|
 | Wissal OUCHEN | |
 | Aya HASSANI | |
 | Clément LANGLOIS |  |
