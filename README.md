@@ -5,7 +5,7 @@ le Projet : on développe le jeu Skull en ligne avec des web services Spring Boo
 ## L'équipe
 
 | Membre | Partie |
-
+|---|---|---|
 | Wissal OUCHEN | |
 | Aya HASSANI | |
 | Clément LANGLOIS |  |
@@ -17,6 +17,7 @@ On a découpé le projet en 5 parties : PlayerService, GameService pour les salo
 ## Planning prévisionnel
 
 | Lot | Date | Ce qu'on livre |
+|---|---|---|
 | 1 | 31 octobre | Inscription, connexion, compte admin, création d'un salon et accès à un salon, sauvegarde des données |
 | 2 | 30 novembre | Une partie complète contre l'IA, la sécurité JWT, le remplacement par une IA quand un joueur quitte |
 | 3 | 15 décembre | Historique, classement, marketplace, bannissement, docker-compose et rapport final |
