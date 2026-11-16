@@ -1,0 +1,38 @@
+name: skull
+
+services:
+  player-service:
+    build:
+      context: .
+      dockerfile: player-service/Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./data:/app/data
+
+  game-service:
+    build:
+      context: .
+      dockerfile: game-service/Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./data:/app/data
+
+  ladder-service:
+    build:
+      context: .
+      dockerfile: ladder-service/Dockerfile
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./data:/app/data
+
+  market-service:
+    build:
+      context: .
+      dockerfile: market-service/Dockerfile
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./data:/app/data
