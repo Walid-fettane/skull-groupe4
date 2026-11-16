@@ -6,11 +6,10 @@ le Projet : on développe le jeu Skull en ligne avec des web services Spring Boo
 
 | Membre | Partie |
 |---|---|
-| Wissal OUCHEN | |
-| Aya HASSANI | |
-| Clément LANGLOIS |  |
-| Margerit DEL CARMEN VILLILO | |
-| Walid FETTANE | |
+| Wissal OUCHEN | Responsable de l'interface graphique et de la mise en place sur docker |
+| Clément LANGLOIS | Responsable du Moteur de jeu et de l'IA |
+| Margerit DEL CARMEN VILLILO | Responsable des Salons et du Service classment|
+| Walid FETTANE | Responsable de la Gestion utilisateur et de la Marketplace|
 
 On a découpé le projet en 5 parties : PlayerService, GameService pour les salons, GameService pour le moteur de jeu et l'IA, LadderService avec MarketService, et enfin le client avec Docker.
 
@@ -23,3 +22,8 @@ On a découpé le projet en 5 parties : PlayerService, GameService pour les salo
 | 3 | 15 décembre | Historique, classement, marketplace, bannissement, docker-compose et rapport final |
 
 Pour chaque lot, on rendra une description de ce qu'on a fait, un plan de tests et le rapport des tests.
+
+
+## Base de données
+
+La structure de la base de données (version 1) est disponible dans le fichier [database.sql]
