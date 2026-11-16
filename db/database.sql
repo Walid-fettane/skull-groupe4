@@ -1,6 +1,6 @@
 CREATE TABLE Joueur
 (
-    idJoueur INTEGER PRIMARY KEY AUTOINCREMENT,
+    idJoueur INTEGER PRIMARY KEY ,
     email varchar(100) not null UNIQUE,
     mdp varchar(255) not null,
     role varchar(50) not null default 'ROLE_USER',
@@ -11,17 +11,17 @@ CREATE TABLE Joueur
 
 CREATE TABLE Salon
 (
-    idSalon INTEGER PRIMARY KEY AUTOINCREMENT,
+    idSalon INTEGER PRIMARY KEY ,
     idCreateur INTEGER NOT NULL,
-    nbMaxJoueur varchar(50) not null,
-    nbAi varchar(50) not null,
+    nbMaxJoueur INTEGER  not null,
+    nbAi INTEGER not null,
     status varchar(50) not null,
     FOREIGN KEY (idCreateur) REFERENCES joueur (idJoueur)
     
 );
 
 CREATE TABLE PARTIE(
-    idPartie INTEGER PRIMARY KEY AUTOINCREMENT,
+    idPartie INTEGER PRIMARY KEY ,
     datefin DATETIME not null,
     idSalon INTEGER not null,
     FOREIGN KEY (idSalon) REFERENCES Salon(idSalon)
