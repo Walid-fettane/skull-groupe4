@@ -33,9 +33,9 @@ CREATE TABLE historique_participation(
     idPartie INTEGER not null,
     score INTEGER not null default 0,
     nbtuillesRestantes INTEGER not null,
-    est_gagnant INTEGER not null default 0, --0(perrdu) ou 1(gagné) pour les valeur vrai ou faux(sqlite ne supporte pas le type boolean)
+    est_gagnant INTEGER not null default 0, --0(perdu) ou 1(gagné) pour les valeur vrai ou faux(sqlite ne supporte pas le type boolean)
     PRIMARY KEY (idJoueur, idPartie),
     FOREIGN KEY (idJoueur) REFERENCES Joueur(idJoueur),
     FOREIGN KEY (idPartie) REFERENCES PARTIE(idPartie) 
 
-).
+);
