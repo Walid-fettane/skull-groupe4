@@ -1,3 +1,5 @@
+package fr.miage.skull;
+
 public class JoueurStatsDTO {
     private long idJoueur;
     private int nbVictoires;

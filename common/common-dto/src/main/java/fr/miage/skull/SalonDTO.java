@@ -1,3 +1,5 @@
+package fr.miage.skull;
+
 public class SalonDTO {
     private Long idSalon;
     private Long idCreateur;
