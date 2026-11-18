@@ -10,7 +10,7 @@ import java.util.List;
 public record GameStateDTO(
         @NotNull
         @Positive
-        Long gameId,
+        long gameId,
 
         @NotNull
         GameStatus status,

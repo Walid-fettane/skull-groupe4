@@ -17,7 +17,7 @@ public record PlayerGameDTO(
         @NotBlank
         String username,
 
-        Long skinId,
+        long skinId,
 
         @PositiveOrZero
         @Max(4)

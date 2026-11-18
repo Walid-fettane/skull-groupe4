@@ -12,10 +12,10 @@ public record CoupDTO(
         DisqueType disqueType,
 
         @Positive(message = "encherirNb doit être supérieur à 0")
-        Integer encherirNb,
+        int encherirNb,
 
         @Positive(message = "revelerPlayerId doit être un identifiant valide")
-        Integer revelerPlayerId) {
+        int revelerPlayerId) {
 
     @Override
     public CoupType coupType() {
@@ -28,12 +28,12 @@ public record CoupDTO(
     }
 
     @Override
-    public Integer encherirNb() {
+    public int encherirNb() {
         return encherirNb;
     }
 
     @Override
-    public Integer revelerPlayerId() {
+    public int revelerPlayerId() {
         return revelerPlayerId;
     }
 }
