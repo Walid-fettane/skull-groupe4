@@ -9,11 +9,13 @@ public class Enchere {
     private int enchereCourrante;
     private int playerIdEnchere;
     private int enchereId;
+    private Tour tour;
 
-    public Enchere(int id){
+    public Enchere(int id, Tour tour){
         this.enchereCourrante = 0;
         this.playerIdEnchere = -1;
         this.enchereId = id;
+        this.tour = tour;
     }
 
     //Quand on arrive ici, on sait que c'est le tour du joueur

@@ -1,5 +1,7 @@
 package fr.miage.skull.model;
 
+import fr.miage.skull.DisqueType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,9 +19,9 @@ public class DisquePile {
         disques.put(nbDisque++, unDisque);
     }
 
-    public Disque revelerPremierDisque() {
+    public DisqueType revelerPremierDisque() {
         nbDisque--;
-        return disques.remove(nbDisque);
+        return disques.remove(nbDisque).getType();
     }
 
     public void reinitialiserPile() {
@@ -33,5 +35,20 @@ public class DisquePile {
 
     public int getNbDisque() {
         return nbDisque;
+    }
+
+    public Map<Integer, Disque> getDisques(){
+        return this.disques;
+    }
+
+    public boolean revelerTouteLaPile(){
+        boolean hasSkull = false;
+        for(Disque unDisque : this.disques.values()){
+            unDisque.setRevele(true);
+            if(unDisque.getType()==DisqueType.SKULL){
+                hasSkull = true;
+            }
+        }
+        return hasSkull;
     }
 }

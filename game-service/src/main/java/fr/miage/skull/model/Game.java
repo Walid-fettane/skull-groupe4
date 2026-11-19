@@ -6,6 +6,7 @@ import fr.miage.skull.GameStateDTO;
 import fr.miage.skull.GameStatus;
 import fr.miage.skull.Phase;
 import fr.miage.skull.exception.DebutDeLaPartieImpossibleException;
+import fr.miage.skull.exception.JoueurElimineException;
 import fr.miage.skull.exception.JoueurNonDansPartieException;
 import fr.miage.skull.exception.PasLeTourDuJoueurException;
 
@@ -26,7 +27,7 @@ public class Game {
     private Long tourId;
     private List<Signalement> signalements;
 
-    public void commencerJeu() throws DebutDeLaPartieImpossibleException{
+    public void commencerJeu() throws DebutDeLaPartieImpossibleException {
         this.initJoueursStatus();
         this.validerDebutPartie();
         this.status = GameStatus.EN_COURS;
@@ -35,7 +36,7 @@ public class Game {
         this.initTour();
     }
 
-    public void jouerCoup(CoupDTO coup, int playerId){
+    public void jouerCoup(CoupDTO coup, int playerId) throws JoueurElimineException {
         valideJoueur(playerId);
         if(tour != null){
             tour.jouerCoup(playerId, coup);
@@ -43,12 +44,17 @@ public class Game {
     }
 
     //On valide que le joueur est dans la partie et que c'est à lui de jouer
-    public void valideJoueur(int playerId){
+    public void valideJoueur(int playerId) throws JoueurElimineException {
+        //On valide que le joueur n'est pas éliminé
+        validerJoueurPasElimine(playerId);
+
+        //Qu'il est bien dans la partie
         Joueur joueur = getJoueurParId(playerId);
         if(joueur == null){
             throw new JoueurNonDansPartieException();
         }
 
+        //Que c'est bien à lui de jouer
         if(!(Objects.equals(getIdJoueurCourant(), playerId))){
             throw new PasLeTourDuJoueurException();
         }
@@ -66,6 +72,12 @@ public class Game {
         }
     }
 
+    public void validerJoueurPasElimine(int playerId) throws JoueurElimineException {
+        if(getJoueurParId(playerId).estElimine()){
+            throw new JoueurElimineException();
+        }
+    }
+
     public void initJoueursStatus(){
         for(Joueur unJoueur : this.listeJoueurs){
             unJoueur.initialiserDisques();
@@ -76,14 +88,33 @@ public class Game {
         tour = new Tour(0L, this);
     }
 
+    private void commencerNouveauTour() {
+        //On met tour à null pour éviter les coup de s'éxecuter ou autre problèmes..
+        this.tour = null;
+        for(Joueur unJoueur : this.listeJoueurs){
+            unJoueur.resetElimination();
+            unJoueur.recupererDisque();
+        }
+        this.tour = new Tour(++this.tourId, this);
+    }
+
+    //@param skullRetourneJoueurId = Le joueur à qui la skull s'est fait retourné si le challenge est perdu..
+    public void appliquerResultatChallenge(boolean challengeGagne, int skullRetourneJoueurId, int challengerId){
+        if(challengeGagne){
+            Joueur joueur = getJoueurParId(challengerId);
+            joueur.ajouterVictoire();
+            if(joueur.getNbVictoire() == 2){
+                finirJeu(); //TODO à définir
+            }
+
+        }
+    }
+
     public void finirJeu() {
     }
 
-    public void appliquerCoup() {
-    }
-
     public List<Joueur> getJoueursActif() {
-        return null;
+        return this.listeJoueurs;
     }
 
     public GameStateDTO getEtatPourJoueurId(Integer playerId) {
@@ -91,10 +122,11 @@ public class Game {
     }
 
     public void setGagnant(Integer playerId) {
+
     }
 
-    public boolean estJoueur(Integer playerId) {
-        return false;
+    public boolean estJoueur(int playerId) {
+        return this.listeJoueurs.stream().anyMatch(x -> x.getId()==playerId);
     }
 
     public Joueur getJoueurParId(Integer playerId) {
@@ -104,17 +136,8 @@ public class Game {
     public void ajouterIA() {
     }
 
-    private boolean valideCoup(CoupDTO unCoup) {
-        return false;
-    }
-
-    private void finTour() {
-    }
-
-    private void commencerNouveauTour() {
-    }
-
     private void prochainJoueur() {
+
     }
 
     public Long getId() {

@@ -12,7 +12,6 @@ import java.util.Objects;
 public class Tour {
 
     private long tourId;
-    private int idJoueurCourrant;
     private Phase phase;
     private Enchere enchere;
     private int enchereId=0;
@@ -83,6 +82,19 @@ public class Tour {
     }
 
     public void reveler(int playerId, int playerTargetId) {
+        //Si le voulant réveler n'est pas le challenger --> Exception
+        if(!(this.challenge.getPlayerChallengerId()==playerId)){
+            throw new PasLeTourDuJoueurException();
+        }
+
+        //Si le joueur veut se révèler lui-même alors il révèle sa pile
+        if(playerId==playerTargetId){
+            this.challenge.revelerSaPile();
+            return;
+        }
+
+        //Le joueur révèle un autre joueur
+        this.challenge.revelerLePremierDisque(playerTargetId);
     }
 
     // On valide que le coup qu'il joue est valide avec le status de la partie
@@ -101,12 +113,16 @@ public class Tour {
     }
 
     public void initEnchere(){
-        this.enchere = new Enchere(this.enchereId++);
+        this.enchere = new Enchere(this.enchereId++, this);
         this.phase = Phase.ENCHERE;
     }
 
     public void initChallenge(int playerId, int challengeNb, int challengeId){
-        this.challenge = new Challenge(playerId, challengeNb, challengeId++);
+        this.challenge = new Challenge(playerId, challengeNb, challengeId++, this.gameAssocTour.getListeJoueurs(), this);
         this.phase = Phase.CHALLENGE;
+    }
+
+    public void resultatChallenge(boolean challengeGagne, int skullRetourneJoueurId, int challengerId){
+        this.gameAssocTour.appliquerResultatChallenge(challengeGagne, skullRetourneJoueurId, challengerId);
     }
 }

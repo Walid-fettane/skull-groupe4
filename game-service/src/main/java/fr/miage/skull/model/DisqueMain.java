@@ -3,6 +3,7 @@ package fr.miage.skull.model;
 import fr.miage.skull.DisqueType;
 
 import java.util.List;
+import java.util.Random;
 
 public class DisqueMain {
 
@@ -22,7 +23,12 @@ public class DisqueMain {
         return false;
     }
 
-    public void enleverDisqueAleatoirement() {
+    public void enleverDisqueAleatoirement(Random random) {
+        if (disques.isEmpty()) {
+            return; //N'a pas de disque
+        }
+        int index = random.nextInt(disques.size());
+        disques.remove(index);
     }
 
     public int getNbDisque(){

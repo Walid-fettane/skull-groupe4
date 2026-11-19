@@ -120,4 +120,9 @@ public class GameExceptionHandler {
     public ProblemDetail handleDebutPartieImpossible(DebutDeLaPartieImpossibleException e){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Impossible de débuter la partie dans ces conditions");
     }
+
+    @ExceptionHandler(JoueurElimineException.class)
+    public ProblemDetail handleJoueurElimineException(JoueurElimineException e){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Vous êtes éliminé, vous ne pouvez plus jouer");
+    }
 }
