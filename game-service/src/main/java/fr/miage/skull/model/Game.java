@@ -5,27 +5,26 @@ import fr.miage.skull.CoupDTO;
 import fr.miage.skull.GameStateDTO;
 import fr.miage.skull.GameStatus;
 import fr.miage.skull.Phase;
-import fr.miage.skull.exception.DebutDeLaPartieImpossibleException;
-import fr.miage.skull.exception.JoueurElimineException;
-import fr.miage.skull.exception.JoueurNonDansPartieException;
-import fr.miage.skull.exception.PasLeTourDuJoueurException;
+import fr.miage.skull.exception.*;
 
 import java.util.List;
 import java.util.Objects;
 
 public class Game {
 
-    private Long id;
+    private long id;
     private GameStatus status;
     private Phase statusCoup;
-    //TODO : penser à voir quand incrémenter le coupNumero
+    //coupNumero est un peu comme une version, ça servira à savoir pour le client
+    //S'il y a une différence entre un Etat reçu ou un autre
     private long coupNumero;
-    private List<Joueur> listeJoueurs;
-    //TODO : penser à voir quand changer idJoueurCourrant
-    private Integer idJoueurCourant;
+    private List<IJoueur> listeJoueurs;
+    private int idJoueurCourant;
     private Tour tour;
-    private Long tourId;
+    private long tourId;
     private List<Signalement> signalements;
+    private int indexJoueurCourant = 0;
+    private int vainqueurId = -1;
 
     public void commencerJeu() throws DebutDeLaPartieImpossibleException {
         this.initJoueursStatus();
@@ -79,7 +78,7 @@ public class Game {
     }
 
     public void initJoueursStatus(){
-        for(Joueur unJoueur : this.listeJoueurs){
+        for(IJoueur unJoueur : this.listeJoueurs){
             unJoueur.initialiserDisques();
         }
     }
@@ -91,7 +90,7 @@ public class Game {
     private void commencerNouveauTour() {
         //On met tour à null pour éviter les coup de s'éxecuter ou autre problèmes..
         this.tour = null;
-        for(Joueur unJoueur : this.listeJoueurs){
+        for(IJoueur unJoueur : this.listeJoueurs){
             unJoueur.resetElimination();
             unJoueur.recupererDisque();
         }
@@ -104,16 +103,18 @@ public class Game {
             Joueur joueur = getJoueurParId(challengerId);
             joueur.ajouterVictoire();
             if(joueur.getNbVictoire() == 2){
-                finirJeu(); //TODO à définir
+                finirJeu(joueur.getId()); //TODO à définir
             }
 
         }
     }
 
-    public void finirJeu() {
+    public void finirJeu(int vainqueurId) {
+        this.vainqueurId=vainqueurId;
+        this.status = GameStatus.TERMINE;
     }
 
-    public List<Joueur> getJoueursActif() {
+    public List<IJoueur> getJoueursActif() {
         return this.listeJoueurs;
     }
 
@@ -136,9 +137,28 @@ public class Game {
     public void ajouterIA() {
     }
 
-    private void prochainJoueur() {
-
+    public void prochainJoueur() {
+        this.coupNumero++;
+        this.indexJoueurCourant = (this.indexJoueurCourant + 1) % this.listeJoueurs.size();
+        IJoueur prochainJoueur =  this.listeJoueurs.get(this.indexJoueurCourant);
+        this.idJoueurCourant = prochainJoueur.getId();
+        if(prochainJoueur instanceof JoueurIA){
+            //Si le prochain joueur est instance de JoueurIA donc s'il est une IA, on demande de trouver un coup
+            trouverCoup((JoueurIA) prochainJoueur);
+        }
     }
+
+    public void trouverCoup(JoueurIA ai){
+        try {
+            //On joue un coup trouvé par l'IA
+            jouerCoup(ai.genererCoup(), this.idJoueurCourant);
+        } catch (JoueurElimineException e){
+            //Si l'IA est éliminé, alors, on passe au prochain joueur
+            prochainJoueur();
+        }
+    }
+
+
 
     public Long getId() {
         return id;
@@ -180,11 +200,11 @@ public class Game {
         this.coupNumero = coupNumero;
     }
 
-    public List<Joueur> getListeJoueurs() {
+    public List<IJoueur> getListeJoueurs() {
         return listeJoueurs;
     }
 
-    public void setListeJoueurs(List<Joueur> listeJoueurs) {
+    public void setListeJoueurs(List<IJoueur> listeJoueurs) {
         this.listeJoueurs = listeJoueurs;
     }
 

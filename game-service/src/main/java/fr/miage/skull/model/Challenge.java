@@ -14,10 +14,10 @@ public class Challenge {
     private int fleursRevelesId;
     private int challengeId;
     private boolean aReveleSaPile;
-    private List<Joueur> joueurs;
+    private List<IJoueur> joueurs;
     private Tour tour;
 
-    public Challenge(int playerChallengerId, int challengeNb, int challengeId, List<Joueur> joueurs, Tour tour){
+    public Challenge(int playerChallengerId, int challengeNb, int challengeId, List<IJoueur> joueurs, Tour tour){
         this.playerChallengerId = playerChallengerId;
         this.challengeNb = challengeNb;
         this.challengeId = challengeId;
@@ -29,8 +29,8 @@ public class Challenge {
 
     public void revelerSaPile() {
         //On cherche le challenger avec son id dans la liste des joueurs
-        Joueur challenger = null;
-        for(Joueur joueur : this.joueurs){
+        IJoueur challenger = null;
+        for(IJoueur joueur : this.joueurs){
             if(joueur.getId()==this.playerChallengerId){
                 challenger = joueur;
             }
@@ -57,7 +57,7 @@ public class Challenge {
             throw new CoupNonAutoriseException();
         }
 
-        Joueur joueur = this.joueurs.stream()
+        IJoueur joueur = this.joueurs.stream()
                 .filter(x -> x.getId() == targetPlayerId)
                 .findFirst()
                 .orElseThrow(JoueurNonDansPartieException::new);

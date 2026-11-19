@@ -28,8 +28,9 @@ public class Tour {
     }
 
 
-    public void jouerCoup(int playerId, CoupDTO coup){
+    public void jouerCoup(int playerId, CoupDTO coup) {
         valideCoup(playerId, coup);
+
         switch(coup.coupType()){
             case CoupType.PLACER_DISQUE -> placerDisque(playerId, coup.disqueType());
             case CoupType.ENCHERIR -> encherir(playerId, coup.encherirNb());
@@ -40,20 +41,20 @@ public class Tour {
     //Avant cela, on aura déjà verifier que c'est bien à ce joueur de jouer..
     public void placerDisque(int playerId, DisqueType disqueType) {
         if(this.phase != Phase.PLACEMENT){
-            throw new RegleMetierException();
+            throw new CoupNonAutoriseException();
         }
 
         Joueur joueur = gameAssocTour.getJoueurParId(playerId);
-
         if(!joueur.possedeDisqueType(disqueType)){
             throw new DisqueIndisponibleException();
         }
 
         joueur.placerDisque(disqueType);
+        this.prochainJoueur();
     }
 
     public void encherir(int playerId, int enchereNb) {
-        if (!peutEncherir(playerId)) {
+        if (!peutEncherir(playerId, enchereNb)) {
             throw new CoupNonAutoriseException();
         }
         if (this.phase == Phase.PLACEMENT) {
@@ -61,12 +62,18 @@ public class Tour {
         }
 
         this.enchere.encherir(playerId, enchereNb);
+        this.prochainJoueur();
     }
 
-    public boolean peutEncherir(int playerId){
+    public boolean peutEncherir(int playerId, int enchereNb){
         Joueur joueur = this.gameAssocTour.getJoueurParId(playerId);
+        int maxEnchere = 0;
+        for(IJoueur unJoueur : this.gameAssocTour.getListeJoueurs()){
+            maxEnchere+=unJoueur.getNbDisquePile();
+        }
         //Si c'est le tour du joueur et qu'il à déjà un disque dans sa pile, alors il peut enchérir sinon non
-        return joueur.getNbDisquePile() >= 1;
+        //On verifie aussi que l'enchère est égale ou en dessous du nombre de disque dans les piles de tous les joueurs cumulés
+        return joueur.getNbDisquePile() >= 1 && enchereNb <= maxEnchere;
     }
 
     public void commencerChallenge(int playerId) {
@@ -82,6 +89,11 @@ public class Tour {
     }
 
     public void reveler(int playerId, int playerTargetId) {
+        //On verifi la phase en cours
+        if(phase!=Phase.REVELATION){
+            throw new CoupNonAutoriseException();
+        }
+
         //Si le voulant réveler n'est pas le challenger --> Exception
         if(!(this.challenge.getPlayerChallengerId()==playerId)){
             throw new PasLeTourDuJoueurException();
@@ -95,16 +107,18 @@ public class Tour {
 
         //Le joueur révèle un autre joueur
         this.challenge.revelerLePremierDisque(playerTargetId);
+        this.prochainJoueur();
     }
 
     // On valide que le coup qu'il joue est valide avec le status de la partie
-    public void valideCoup(int playerId, CoupDTO coup) {
+    public void valideCoup(int playerId, CoupDTO coup) throws CoupNonAutoriseException {
         boolean valide = switch (coup.coupType()) {
             case PLACER_DISQUE -> this.phase == Phase.PLACEMENT;
+            //On ne met pas de check sur la phase Challenge, car elle s'active d'elle même
+            //Les phases challenge et revelation sont un peu ambigue, on utilisera seulement REVELATION
             case REVELER -> this.phase == Phase.REVELATION;
             //On fera d'avantage de check plus tard pour encherir..
             case ENCHERIR -> this.phase == Phase.PLACEMENT || this.phase == Phase.ENCHERE;
-
         };
 
         if (!valide) {
@@ -119,10 +133,14 @@ public class Tour {
 
     public void initChallenge(int playerId, int challengeNb, int challengeId){
         this.challenge = new Challenge(playerId, challengeNb, challengeId++, this.gameAssocTour.getListeJoueurs(), this);
-        this.phase = Phase.CHALLENGE;
+        this.phase = Phase.REVELATION;
     }
 
     public void resultatChallenge(boolean challengeGagne, int skullRetourneJoueurId, int challengerId){
         this.gameAssocTour.appliquerResultatChallenge(challengeGagne, skullRetourneJoueurId, challengerId);
+    }
+
+    public void prochainJoueur(){
+        this.gameAssocTour.prochainJoueur();
     }
 }
