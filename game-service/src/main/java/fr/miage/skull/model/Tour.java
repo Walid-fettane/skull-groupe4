@@ -34,6 +34,7 @@ public class Tour {
         switch(coup.coupType()){
             case CoupType.PLACER_DISQUE -> placerDisque(playerId, coup.disqueType());
             case CoupType.ENCHERIR -> encherir(playerId, coup.encherirNb());
+            case CoupType.ENCHERE_PASSE -> encherePasse(playerId);
             case CoupType.REVELER -> reveler(playerId, coup.revelerPlayerId());
         }
     }
@@ -119,6 +120,7 @@ public class Tour {
             case REVELER -> this.phase == Phase.REVELATION;
             //On fera d'avantage de check plus tard pour encherir..
             case ENCHERIR -> this.phase == Phase.PLACEMENT || this.phase == Phase.ENCHERE;
+            case ENCHERE_PASSE -> this.phase == Phase.ENCHERE;
         };
 
         if (!valide) {
@@ -140,7 +142,15 @@ public class Tour {
         this.gameAssocTour.appliquerResultatChallenge(challengeGagne, skullRetourneJoueurId, challengerId);
     }
 
+    public void encherePasse(int playerId){
+        this.gameAssocTour.encherePasse(playerId);
+    }
+
     public void prochainJoueur(){
         this.gameAssocTour.prochainJoueur();
+    }
+
+    public Phase getPhase(){
+        return this.phase;
     }
 }

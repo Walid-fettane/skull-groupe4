@@ -7,6 +7,7 @@ import fr.miage.skull.GameStatus;
 import fr.miage.skull.Phase;
 import fr.miage.skull.exception.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +27,9 @@ public class Game {
     private int indexJoueurCourant = 0;
     private int vainqueurId = -1;
 
+    //tableau des ids des joueurs ayant passé l'enchère dans le tour courrant
+    private List<Integer> playerIdEncherePasse;
+
     public void commencerJeu() throws DebutDeLaPartieImpossibleException {
         this.initJoueursStatus();
         this.validerDebutPartie();
@@ -33,6 +37,7 @@ public class Game {
         this.coupNumero = 0;
         this.idJoueurCourant = listeJoueurs.getFirst().getId();
         this.initTour();
+        this.playerIdEncherePasse = new ArrayList<>();
     }
 
     public void jouerCoup(CoupDTO coup, int playerId) throws JoueurElimineException {
@@ -90,11 +95,13 @@ public class Game {
     private void commencerNouveauTour() {
         //On met tour à null pour éviter les coup de s'éxecuter ou autre problèmes..
         this.tour = null;
+        this.playerIdEncherePasse = null;
         for(IJoueur unJoueur : this.listeJoueurs){
             unJoueur.resetElimination();
             unJoueur.recupererDisque();
         }
         this.tour = new Tour(++this.tourId, this);
+        this.playerIdEncherePasse = new ArrayList<>();
     }
 
     //@param skullRetourneJoueurId = Le joueur à qui la skull s'est fait retourné si le challenge est perdu..
@@ -137,6 +144,10 @@ public class Game {
     public void ajouterIA() {
     }
 
+    public void encherePasse(int playerId){
+        this.playerIdEncherePasse.add(playerId);
+    }
+
     public void prochainJoueur() {
         this.coupNumero++;
         this.indexJoueurCourant = (this.indexJoueurCourant + 1) % this.listeJoueurs.size();
@@ -145,6 +156,27 @@ public class Game {
         if(prochainJoueur instanceof JoueurIA){
             //Si le prochain joueur est instance de JoueurIA donc s'il est une IA, on demande de trouver un coup
             trouverCoup((JoueurIA) prochainJoueur);
+        }
+
+        //Si c'est une phase d'enchere
+        if(this.tour.getPhase()==Phase.ENCHERE){
+            //On prend le nombre de joueurs non elimine qu'on compare au nombre d'id dans la liste de joueur qui ont passé
+            //Si un seul joueur n'a pas passé, alors le challenge peut commencer
+            if((this.getNbPlayerNonElimine()-this.getListIdPlayerPasserEnchere().size())==1){
+                //On cherche le joueur non éliminé qui à son id dans listeJoueur mais pas dans playerIdEncherePasse
+                //AKA note challengeur
+                int playerIdChallenge = listeJoueurs.stream()
+                        .filter(joueur -> !joueur.estElimine())
+                        .map(IJoueur::getId)
+                        .filter(id -> !playerIdEncherePasse.contains(id))
+                        .findFirst()
+                        .orElseThrow();
+                //On indique à l'objet du tour que le challenge peut commencer avec le challenger en id
+                this.tour.commencerChallenge(playerIdChallenge);
+            }
+            if(this.playerIdEncherePasse.contains(prochainJoueur.getId())){
+                prochainJoueur();
+            }
         }
     }
 
@@ -223,4 +255,13 @@ public class Game {
     public void setStatus(GameStatus status) {
         this.status = status;
     }
+
+    public long getNbPlayerNonElimine(){
+        return this.listeJoueurs.stream().filter(x -> !x.estElimine()).count();
+    }
+
+    public List<Integer> getListIdPlayerPasserEnchere(){
+        return this.playerIdEncherePasse;
+    }
+
 }

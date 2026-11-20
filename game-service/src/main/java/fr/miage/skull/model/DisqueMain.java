@@ -4,6 +4,7 @@ import fr.miage.skull.DisqueType;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class DisqueMain {
 
@@ -13,6 +14,7 @@ public class DisqueMain {
     }
 
     public void supprimerDisque(DisqueType disqueType) {
+        disques.removeIf(unDisque -> unDisque.getType() == disqueType);
     }
 
     public boolean possedeType(DisqueType disqueType) {
@@ -20,7 +22,7 @@ public class DisqueMain {
     }
 
     public boolean estVide() {
-        return false;
+        return disques.isEmpty();
     }
 
     public void enleverDisqueAleatoirement(Random random) {
