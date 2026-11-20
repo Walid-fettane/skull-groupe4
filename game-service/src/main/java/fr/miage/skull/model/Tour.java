@@ -6,8 +6,8 @@ import fr.miage.skull.CoupType;
 import fr.miage.skull.DisqueType;
 import fr.miage.skull.Phase;
 import fr.miage.skull.exception.*;
-
-import java.util.Objects;
+import fr.miage.skull.model.joueur.IJoueur;
+import fr.miage.skull.model.joueur.Joueur;
 
 public class Tour {
 
@@ -152,5 +152,9 @@ public class Tour {
 
     public Phase getPhase(){
         return this.phase;
+    }
+
+    public int getEnchereEnCours(){
+        return this.enchere.getCurrentEnchere();
     }
 }

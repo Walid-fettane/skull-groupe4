@@ -1,4 +1,4 @@
-package fr.miage.skull.model;
+package fr.miage.skull.model.joueur;
 
 public class Joueur extends AbstractJoueur {
 

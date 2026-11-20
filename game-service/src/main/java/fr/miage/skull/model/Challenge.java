@@ -3,8 +3,8 @@ package fr.miage.skull.model;
 import fr.miage.skull.DisqueType;
 import fr.miage.skull.exception.CoupNonAutoriseException;
 import fr.miage.skull.exception.JoueurNonDansPartieException;
+import fr.miage.skull.model.joueur.IJoueur;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Challenge {

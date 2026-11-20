@@ -12,7 +12,7 @@ import java.util.List;
 public record PlayerGameDTO(
         @NotNull
         @Positive
-        Integer playerId,
+        int playerId,
 
         @NotBlank
         String username,

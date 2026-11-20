@@ -125,4 +125,9 @@ public class GameExceptionHandler {
     public ProblemDetail handleJoueurElimineException(JoueurElimineException e){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Vous êtes éliminé, vous ne pouvez plus jouer");
     }
+
+    @ExceptionHandler(GameNotFoundException.class)
+    public ProblemDetail handleGameNotFoundException(GameNotFoundException e){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Aucune partie n'existe pour cette id");
+    }
 }

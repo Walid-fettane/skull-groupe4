@@ -1,15 +1,17 @@
 package fr.miage.skull.model;
 
 
-import fr.miage.skull.CoupDTO;
-import fr.miage.skull.GameStateDTO;
-import fr.miage.skull.GameStatus;
-import fr.miage.skull.Phase;
+import fr.miage.skull.*;
 import fr.miage.skull.exception.*;
+import fr.miage.skull.model.joueur.IJoueur;
+import fr.miage.skull.model.joueur.Joueur;
+import fr.miage.skull.model.joueur.JoueurIA;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -53,14 +55,18 @@ public class Game {
         validerJoueurPasElimine(playerId);
 
         //Qu'il est bien dans la partie
-        Joueur joueur = getJoueurParId(playerId);
-        if(joueur == null){
-            throw new JoueurNonDansPartieException();
-        }
+        valideJoueurDansLaPartie(playerId);
 
         //Que c'est bien à lui de jouer
         if(!(Objects.equals(getIdJoueurCourant(), playerId))){
             throw new PasLeTourDuJoueurException();
+        }
+    }
+
+    public void valideJoueurDansLaPartie(int playerId){
+        Joueur joueur = getJoueurParId(playerId);
+        if(joueur == null){
+            throw new JoueurNonDansPartieException();
         }
     }
 
@@ -125,8 +131,16 @@ public class Game {
         return this.listeJoueurs;
     }
 
-    public GameStateDTO getEtatPourJoueurId(Integer playerId) {
-        return null;
+    public GameStateDTO getEtatPourJoueurId(int playerId) {
+        valideJoueurDansLaPartie(playerId);
+        return new GameStateDTO(this.id,
+                this.getStatus(),
+                this.tour.getPhase(),
+                this.getCoupNumero(),
+                this.tour.getEnchereEnCours(),
+                getDisquesDTO(playerId),
+                getPlayersDTO(playerId)
+        );
     }
 
     public void setGagnant(Integer playerId) {
@@ -264,4 +278,32 @@ public class Game {
         return this.playerIdEncherePasse;
     }
 
+    public MesDisquesDTO getDisquesDTO(int playerId) {
+        //On trouve le joueur
+        Optional<IJoueur> joueur = getListeJoueurs().stream().filter(x -> x.getId()==playerId).findFirst();
+        if(joueur.isPresent()){
+            IJoueur leJoueur = joueur.get();
+            return new MesDisquesDTO(leJoueur.getNbDisquesMain(), leJoueur.getDisqueMain().possedeType(DisqueType.SKULL));
+        }
+        return null;
+    }
+
+    public List<PlayerGameDTO> getPlayersDTO(int playerId){
+        List<PlayerGameDTO> retourAttendu = new ArrayList<>();
+        //On cherche tous les joueurs sauf le demandeur
+        List<IJoueur> joueurs = getListeJoueurs().stream().filter(x -> x.getId() != playerId).toList();
+
+        for(IJoueur unJoueur : joueurs){
+            retourAttendu.add(new PlayerGameDTO(
+                    unJoueur.getId(),
+                    unJoueur.getUsername(),
+                    unJoueur.getskinId(),
+                    unJoueur.getNbDisquesMain(),
+                    unJoueur.getDisquesDTO(),
+                    unJoueur.getNbVictoire()
+                    ));
+        }
+
+        return retourAttendu;
+    }
 }

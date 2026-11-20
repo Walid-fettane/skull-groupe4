@@ -1,4 +1,4 @@
-package fr.miage.skull.model;
+package fr.miage.skull.model.joueur;
 
 import fr.miage.skull.CoupDTO;
 

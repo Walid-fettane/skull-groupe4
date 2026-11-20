@@ -1,8 +1,12 @@
-package fr.miage.skull.model;
+package fr.miage.skull.model.joueur;
 
+import fr.miage.skull.DisqueDTO;
 import fr.miage.skull.DisqueType;
+import fr.miage.skull.model.Disque;
+import fr.miage.skull.model.DisqueMain;
+import fr.miage.skull.model.DisquePile;
 
-import java.util.Random;
+import java.util.*;
 
 public class AbstractJoueur implements IJoueur {
 
@@ -13,6 +17,7 @@ public class AbstractJoueur implements IJoueur {
     private DisquePile disquePile;
     private int nbVictoire;
     private Random rand;
+    private long skinId;
 
     protected AbstractJoueur() {
         this.rand = new Random();
@@ -47,6 +52,28 @@ public class AbstractJoueur implements IJoueur {
     @Override
     public DisqueType revelerDisque(){
         return this.disquePile.revelerPremierDisque();
+    }
+
+    @Override
+    public int getNbDisquesMain() {
+        return this.disqueMain.getNbDisque();
+    }
+
+    @Override
+    public long getskinId() {
+        return this.skinId;
+    }
+
+    @Override
+    public List<DisqueDTO> getDisquesDTO() {
+        List<DisqueDTO> dto = new ArrayList<>();
+        List<Disque> disques = getDisquePile().getDisques().values().stream().toList();
+        for(int unePoseDisque : getDisquePile().getDisques().keySet()){
+            Disque disque = disques.get(unePoseDisque);
+            dto.add(new DisqueDTO(unePoseDisque, disque.getType(), disque.isRevele()));
+        }
+
+        return dto;
     }
 
     @Override
@@ -127,5 +154,7 @@ public class AbstractJoueur implements IJoueur {
     public Random getRand() {
         return this.rand;
     }
+
+
 
 }

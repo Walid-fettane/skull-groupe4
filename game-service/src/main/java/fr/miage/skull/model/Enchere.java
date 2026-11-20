@@ -43,4 +43,5 @@ public class Enchere {
     public int getWinnerEnchereNB() {
         return enchereCourrante;
     }
+    public int getCurrentEnchere(){return this.enchereCourrante;}
 }

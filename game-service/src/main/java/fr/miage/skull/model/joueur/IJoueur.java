@@ -1,7 +1,11 @@
-package fr.miage.skull.model;
+package fr.miage.skull.model.joueur;
 
+import fr.miage.skull.DisqueDTO;
 import fr.miage.skull.DisqueType;
+import fr.miage.skull.model.DisqueMain;
+import fr.miage.skull.model.DisquePile;
 
+import java.util.List;
 import java.util.Random;
 
 public interface IJoueur {
@@ -31,4 +35,10 @@ public interface IJoueur {
     boolean revelerTouteSaPile();
 
     DisqueType revelerDisque();
+
+    int getNbDisquesMain();
+
+    long getskinId();
+
+    List<DisqueDTO> getDisquesDTO();
 }
