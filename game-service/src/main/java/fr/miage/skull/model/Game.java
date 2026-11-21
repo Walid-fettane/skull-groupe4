@@ -197,7 +197,7 @@ public class Game {
     public void trouverCoup(JoueurIA ai){
         try {
             //On joue un coup trouvé par l'IA
-            jouerCoup(ai.genererCoup(), this.idJoueurCourant);
+            jouerCoup(ai.genererCoup(tour.getPhase(), this.tour.getEnchereEnCours(), this.getListeJoueurs().stream().collect(Collectors.toMap(IJoueur::getId, IJoueur::getNbDisquesPilePasRevele))), this.idJoueurCourant);
         } catch (JoueurElimineException e){
             //Si l'IA est éliminé, alors, on passe au prochain joueur
             prochainJoueur();

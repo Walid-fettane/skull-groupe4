@@ -6,19 +6,18 @@ import fr.miage.skull.SignalementDTO;
 import fr.miage.skull.exception.GameNotFoundException;
 import fr.miage.skull.exception.JoueurElimineException;
 import fr.miage.skull.model.Game;
-import fr.miage.skull.model.repos.GameRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameEngineService {
 
     //Instanciation du gameRepository (faut je cherche comment faire)
-    @Autowired
-    private GameRepository repository;
+    private final Map<Long, Game> games = new ConcurrentHashMap<>();
+
     //Mapper
     //Les liens avec les autres services
 
@@ -28,7 +27,7 @@ public class GameEngineService {
     }
 
     public GameStateDTO getEtat(long gameId, int playerId) throws GameNotFoundException {
-        Optional<Game> game = repository.findGameById(gameId);
+        Optional<Game> game = Optional.ofNullable(games.get(gameId));
         if(game.isEmpty()){
             //Si aucune partie n'existe sous cette id --> Exception
             throw new GameNotFoundException();
@@ -39,7 +38,7 @@ public class GameEngineService {
 
     public GameStateDTO jouerCoup(long gameId, int playerId, CoupDTO coup) throws GameNotFoundException, JoueurElimineException {
         //On cherche la partie avec l'id renseigné
-        Optional<Game> game = repository.findGameById(gameId);
+        Optional<Game> game = Optional.ofNullable(games.get(gameId));
         if(game.isEmpty()){
             //Si aucune partie n'existe sous cette id --> Exception
             throw new GameNotFoundException();

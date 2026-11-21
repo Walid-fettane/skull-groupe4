@@ -51,4 +51,8 @@ public class DisquePile {
         }
         return hasSkull;
     }
+
+    public long getNbDisquePasRevele(){
+        return disques.values().stream().filter(Disque::estPasRevele).count();
+    }
 }

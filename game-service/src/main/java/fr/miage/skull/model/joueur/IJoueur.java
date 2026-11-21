@@ -41,4 +41,6 @@ public interface IJoueur {
     long getskinId();
 
     List<DisqueDTO> getDisquesDTO();
+
+    long getNbDisquesPilePasRevele();
 }

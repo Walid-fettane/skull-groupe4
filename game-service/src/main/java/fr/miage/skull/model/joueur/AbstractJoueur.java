@@ -70,10 +70,15 @@ public class AbstractJoueur implements IJoueur {
         List<Disque> disques = getDisquePile().getDisques().values().stream().toList();
         for(int unePoseDisque : getDisquePile().getDisques().keySet()){
             Disque disque = disques.get(unePoseDisque);
-            dto.add(new DisqueDTO(unePoseDisque, disque.getType(), disque.isRevele()));
+            dto.add(new DisqueDTO(unePoseDisque, disque.getType(), disque.estRevele()));
         }
 
         return dto;
+    }
+
+    @Override
+    public long getNbDisquesPilePasRevele() {
+        return this.disquePile.getNbDisquePasRevele();
     }
 
     @Override

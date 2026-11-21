@@ -16,9 +16,10 @@ public class Disque {
         return type;
     }
 
-    public boolean isRevele() {
+    public boolean estRevele() {
         return revele;
     }
+    public boolean estPasRevele(){return !revele;}
 
     public void setRevele(boolean revele) {
         this.revele = revele;
