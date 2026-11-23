@@ -43,4 +43,14 @@ public interface IJoueur {
     List<DisqueDTO> getDisquesDTO();
 
     long getNbDisquesPilePasRevele();
+
+    void supprimerDisque(DisqueType type);
+
+    void setElimine(boolean elimine);
+
+    void ajouterVictoire();
+
+    boolean possedeDisqueType(DisqueType disqueType);
+
+    void placerDisque(DisqueType disqueType);
 }

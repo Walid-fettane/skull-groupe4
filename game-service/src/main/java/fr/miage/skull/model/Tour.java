@@ -7,7 +7,8 @@ import fr.miage.skull.DisqueType;
 import fr.miage.skull.Phase;
 import fr.miage.skull.exception.*;
 import fr.miage.skull.model.joueur.IJoueur;
-import fr.miage.skull.model.joueur.Joueur;
+
+import java.util.Map;
 
 public class Tour {
 
@@ -36,22 +37,29 @@ public class Tour {
             case CoupType.ENCHERIR -> encherir(playerId, coup.encherirNb());
             case CoupType.ENCHERE_PASSE -> encherePasse(playerId);
             case CoupType.REVELER -> reveler(playerId, coup.revelerPlayerId());
+            case CoupType.CHOIX_DISQUE_A_ENLEVER -> enleverDisque(playerId, coup.slotDisque());
         }
     }
 
     //Avant cela, on aura déjà verifier que c'est bien à ce joueur de jouer..
     public void placerDisque(int playerId, DisqueType disqueType) {
-        if(this.phase != Phase.PLACEMENT){
-            throw new CoupNonAutoriseException();
-        }
-
-        Joueur joueur = gameAssocTour.getJoueurParId(playerId);
+        IJoueur joueur = gameAssocTour.getJoueurParId(playerId);
         if(!joueur.possedeDisqueType(disqueType)){
             throw new DisqueIndisponibleException();
         }
 
         joueur.placerDisque(disqueType);
         this.prochainJoueur();
+    }
+
+    public void enleverDisque(int playerId, int slot){
+        IJoueur joueur = this.gameAssocTour.getJoueurParId(playerId);
+        Disque disque = this.gameAssocTour.getdFinChallenge().getDisquePosition().get(slot);
+        if(disque == null){
+            throw new DisqueIndisponibleException();
+        }
+        joueur.supprimerDisque(disque.getType());
+        this.gameAssocTour.finSuppressionDisque();
     }
 
     public void encherir(int playerId, int enchereNb) {
@@ -67,7 +75,7 @@ public class Tour {
     }
 
     public boolean peutEncherir(int playerId, int enchereNb){
-        Joueur joueur = this.gameAssocTour.getJoueurParId(playerId);
+        IJoueur joueur = this.gameAssocTour.getJoueurParId(playerId);
         int maxEnchere = 0;
         for(IJoueur unJoueur : this.gameAssocTour.getListeJoueurs()){
             maxEnchere+=unJoueur.getNbDisquePile();
@@ -121,6 +129,7 @@ public class Tour {
             //On fera d'avantage de check plus tard pour encherir..
             case ENCHERIR -> this.phase == Phase.PLACEMENT || this.phase == Phase.ENCHERE;
             case ENCHERE_PASSE -> this.phase == Phase.ENCHERE;
+            case CHOIX_DISQUE_A_ENLEVER -> this.phase == Phase.FIN_CHALLENGE;
         };
 
         if (!valide) {
@@ -144,6 +153,7 @@ public class Tour {
 
     public void encherePasse(int playerId){
         this.gameAssocTour.encherePasse(playerId);
+        this.prochainJoueur();
     }
 
     public void prochainJoueur(){
@@ -154,7 +164,9 @@ public class Tour {
         return this.phase;
     }
 
+    public void setPhase(Phase newPhase){this.phase=newPhase;}
+
     public int getEnchereEnCours(){
-        return this.enchere.getCurrentEnchere();
+        return this.enchere == null ? 0 : this.enchere.getCurrentEnchere();
     }
 }

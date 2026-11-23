@@ -3,6 +3,7 @@ package fr.miage.skull.model;
 import fr.miage.skull.DisqueType;
 import fr.miage.skull.exception.CoupNonAutoriseException;
 import fr.miage.skull.exception.JoueurNonDansPartieException;
+import fr.miage.skull.exception.RevelationInvalideException;
 import fr.miage.skull.model.joueur.IJoueur;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class Challenge {
 
     private int playerChallengerId;
     private int challengeNb;
-    private int fleursRevelesId;
+    private int nbFleurRevele;
     private int challengeId;
     private boolean aReveleSaPile;
     private List<IJoueur> joueurs;
@@ -22,7 +23,7 @@ public class Challenge {
         this.challengeNb = challengeNb;
         this.challengeId = challengeId;
         this.aReveleSaPile = false;
-        this.fleursRevelesId = 0;
+        this.nbFleurRevele = 0;
         this.joueurs  = joueurs;
         this.tour = tour;
     }
@@ -42,12 +43,15 @@ public class Challenge {
                 //Si le joueur à retourné un skull dans sa pile, alors il perd le challenge
                 finChallenge(false, challenger.getId());
             } else {
-                fleursRevelesId+=challenger.getNbDisquePile();
+                nbFleurRevele +=challenger.getNbDisquePile();
             }
         }
 
 
         this.aReveleSaPile=true;
+        if(nbFleurRevele>=challengeNb){
+            finChallenge(true, -1);
+        }
     }
 
     //Le nom est un peu trompeur, cette méthode sert à réveler les disques des autres en général
@@ -62,11 +66,18 @@ public class Challenge {
                 .findFirst()
                 .orElseThrow(JoueurNonDansPartieException::new);
 
+        if(joueur.getNbDisquePile()==0){
+            throw new RevelationInvalideException();
+        }
+
         DisqueType dt = joueur.revelerDisque();
         if(dt == DisqueType.SKULL){
             finChallenge(false, joueur.getId());
         } else {
-            fleursRevelesId++;
+            nbFleurRevele++;
+            if(nbFleurRevele>=challengeNb){
+                finChallenge(true, -1);
+            }
         }
 
     }

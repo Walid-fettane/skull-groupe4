@@ -3,6 +3,6 @@ package fr.miage.skull;
 public enum Phase {
     PLACEMENT,
     ENCHERE,
-    CHALLENGE,
+    FIN_CHALLENGE,
     REVELATION
 }

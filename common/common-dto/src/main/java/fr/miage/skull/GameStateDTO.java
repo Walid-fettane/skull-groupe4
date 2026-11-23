@@ -1,5 +1,6 @@
 package fr.miage.skull;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -26,6 +27,9 @@ public record GameStateDTO(
         @NotNull
         @Valid
         MesDisquesDTO mesDisques,
+
+        @Nullable
+        DisqueFinChallengeDTO dFinChallengeDTO,
 
         @NotNull
         List<@Valid PlayerGameDTO> playerGames) {

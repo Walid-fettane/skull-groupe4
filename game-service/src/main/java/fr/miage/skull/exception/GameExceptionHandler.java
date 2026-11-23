@@ -24,6 +24,11 @@ public class GameExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "La partie n'existe pas");
     }
 
+    @ExceptionHandler(SalonNotFoundException.class)
+    public ProblemDetail handleSalonNotFound(SalonNotFoundException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Le salon n'existe pas");
+    }
+
     @ExceptionHandler(JoueurNonDansPartieException.class)
     public ProblemDetail handleJoueurNonDansPartie(JoueurNonDansPartieException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Le joueur n'a pas rejoint cette partie");
@@ -37,6 +42,21 @@ public class GameExceptionHandler {
     @ExceptionHandler(PartieTermineeException.class)
     public ProblemDetail handlePartieTerminee(PartieTermineeException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "La partie est terminée");
+    }
+
+    @ExceptionHandler(PartieDejaCommenceeException.class)
+    public ProblemDetail handlePartieDejaCommencee(PartieDejaCommenceeException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "La partie a déjà commencé, il n'est plus possible de la rejoindre");
+    }
+
+    @ExceptionHandler(PartiePleineException.class)
+    public ProblemDetail handlePartiePleine(PartiePleineException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "La partie est pleine");
+    }
+
+    @ExceptionHandler(JoueurDejaDansPartieException.class)
+    public ProblemDetail handleJoueurDejaDansPartie(JoueurDejaDansPartieException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Vous avez déjà rejoint cette partie");
     }
 
     @ExceptionHandler(PasLeTourDuJoueurException.class)
@@ -121,6 +141,11 @@ public class GameExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Impossible de débuter la partie dans ces conditions");
     }
 
+    @ExceptionHandler(ConfigurationPartieInvalideException.class)
+    public ProblemDetail handleConfigurationPartieInvalide(ConfigurationPartieInvalideException e){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "La configuration de la partie est invalide : il faut 3 à 6 joueurs et au moins un joueur humain");
+    }
+
     @ExceptionHandler(JoueurElimineException.class)
     public ProblemDetail handleJoueurElimineException(JoueurElimineException e){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Vous êtes éliminé, vous ne pouvez plus jouer");
@@ -129,5 +154,10 @@ public class GameExceptionHandler {
     @ExceptionHandler(GameNotFoundException.class)
     public ProblemDetail handleGameNotFoundException(GameNotFoundException e){
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Aucune partie n'existe pour cette id");
+    }
+
+    @ExceptionHandler(JoueurSignalePasDansLaPartie.class)
+    public ProblemDetail handleJoueurSignalePasDansLaPartieException(JoueurSignalePasDansLaPartie e){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Le joueur que vous avez signalé n'est pas dans votre partie !");
     }
 }

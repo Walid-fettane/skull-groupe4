@@ -21,6 +21,7 @@ public class AbstractJoueur implements IJoueur {
 
     protected AbstractJoueur() {
         this.rand = new Random();
+        this.distribuerDisquesInitiaux();
     }
 
     protected AbstractJoueur(int id, String username) {
@@ -29,6 +30,12 @@ public class AbstractJoueur implements IJoueur {
         this.username = username;
     }
 
+    protected AbstractJoueur(int id, String username, long skinId) {
+        this(id, username);
+        this.skinId = skinId;
+    }
+
+    @Override
     public boolean possedeDisqueType(DisqueType type) {
         return disqueMain.possedeType(type);
     }
@@ -38,15 +45,9 @@ public class AbstractJoueur implements IJoueur {
         return this.disqueMain.estVide();
     }
 
+    @Override
     public void ajouterVictoire() {
         this.nbVictoire++;
-    }
-
-    public void perteAleatoireDisque() {
-        this.disqueMain.enleverDisqueAleatoirement(this.rand);
-        if(this.disqueMain.estVide()){
-            this.elimine = true;
-        }
     }
 
     @Override
@@ -70,7 +71,8 @@ public class AbstractJoueur implements IJoueur {
         List<Disque> disques = getDisquePile().getDisques().values().stream().toList();
         for(int unePoseDisque : getDisquePile().getDisques().keySet()){
             Disque disque = disques.get(unePoseDisque);
-            dto.add(new DisqueDTO(unePoseDisque, disque.getType(), disque.estRevele()));
+            //On regarde si un disque est révélé, si oui, on peut mettre le type, si non, on le met en null pour éviter la triche
+            dto.add(new DisqueDTO(unePoseDisque, disque.estRevele() ? disque.getType() : null, disque.estRevele()));
         }
 
         return dto;
@@ -79,6 +81,19 @@ public class AbstractJoueur implements IJoueur {
     @Override
     public long getNbDisquesPilePasRevele() {
         return this.disquePile.getNbDisquePasRevele();
+    }
+
+    @Override
+    public void supprimerDisque(DisqueType type) {
+        this.disqueMain.supprimerDisque(type);
+        if(this.disqueMain.estVide()&&this.disquePile.estVide()){
+            this.setElimine(true);
+        }
+    }
+
+    @Override
+    public void setElimine(boolean elimine) {
+        this.elimine = elimine;
     }
 
     @Override
@@ -98,12 +113,18 @@ public class AbstractJoueur implements IJoueur {
         return this.disquePile.getNbDisque();
     }
 
+    @Override
     public void placerDisque(DisqueType disqueType) {
+        this.disqueMain.supprimerDisque(disqueType);
         this.disquePile.ajouterDisque(new Disque(disqueType));
     }
 
     @Override
     public void initialiserDisques() {
+        this.distribuerDisquesInitiaux();
+    }
+
+    private void distribuerDisquesInitiaux() {
         //On créer une nouvelle Pile / disque en main donc vide
         this.disqueMain = new DisqueMain();
         this.disquePile = new DisquePile();

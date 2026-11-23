@@ -1,7 +1,6 @@
 package fr.miage.skull;
 
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -10,6 +9,9 @@ public record CoupDTO(
         CoupType coupType,
 
         DisqueType disqueType,
+
+        @Positive(message="Le slot doit être comprit entre 1 et n disques à enlever")
+        int slotDisque,
 
         @Positive(message = "encherirNb doit être supérieur à 0")
         int encherirNb,
@@ -31,6 +33,9 @@ public record CoupDTO(
     public int encherirNb() {
         return encherirNb;
     }
+
+    @Override
+    public int slotDisque(){return slotDisque;}
 
     @Override
     public int revelerPlayerId() {

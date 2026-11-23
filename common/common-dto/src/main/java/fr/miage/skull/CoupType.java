@@ -4,5 +4,6 @@ public enum CoupType {
     PLACER_DISQUE,
     ENCHERIR,
     ENCHERE_PASSE,
-    REVELER
+    REVELER,
+    CHOIX_DISQUE_A_ENLEVER
 }
