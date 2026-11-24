@@ -2,6 +2,9 @@ package fr.miage.skull.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "salons")
 public class Salon {
@@ -9,11 +12,14 @@ public class Salon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idSalon;
-
     private Long idCreateur;
     private long nbMaxJoueur;
     private long nbAi;
     private String status;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "salon_joueurs", joinColumns = @JoinColumn(name = "id_salon"))
+    @Column(name = "id_joueur")
+    private Set<Long> joueurIds = new HashSet<>();
 
     public Salon() {}
 
@@ -62,5 +68,9 @@ public class Salon {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Set<Long> getJoueurIds() { return joueurIds; }
+    public boolean estPlein() {
+        return joueurIds.size() + nbAi >= nbMaxJoueur;
     }
 }
