@@ -2,12 +2,12 @@ package fr.miage.skull;
 
 public class JoueurStatsDTO {
     private long idJoueur;
-    private int nbVictoires;
-    private int nbPartieJouees;
+    private long nbVictoires;
+    private long nbPartieJouees;
     private String email;
     private double ratioVictoires;
 
-    public JoueurStatsDTO(Long idj , int nbVictoires, int nbPartieJouees, String email) {
+    public JoueurStatsDTO(Long idj , long nbVictoires, long nbPartieJouees, String email) {
         this.idJoueur = idj;
         this.nbVictoires = nbVictoires;
         this.nbPartieJouees = nbPartieJouees;
@@ -19,11 +19,11 @@ public class JoueurStatsDTO {
         return idJoueur;
     }
 
-    public int getNbVictoires() {
+    public long getNbVictoires() {
         return nbVictoires;
     }
 
-    public int getNbPartieJouees() {
+    public long getNbPartieJouees() {
         return nbPartieJouees;
     }
 

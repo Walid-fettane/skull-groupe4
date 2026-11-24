@@ -1,10 +1,10 @@
 package fr.miage.skull.service;
 
+import fr.miage.skull.HistoriqueDTO;
 import fr.miage.skull.JoueurStatsDTO;
+import fr.miage.skull.PartieDetailDTO;
 import fr.miage.skull.model.repository.JoueurRepository;
-import io.micrometer.observation.ObservationFilter;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,12 +27,13 @@ public class LadderService {
 
         ))
                 .collect(Collectors.toList());
-    }
-    public Optional <Object> getHistoriqueByJoueur(Long idJoueur) {
+    }//todo apres creation des class partie et partipation
+    public Optional <List<HistoriqueDTO>> getHistoriqueByJoueur(Long idJoueur) {
         return Optional.empty();
+        //todo apres creation des class parite et partiipation
     }
 
-    public Optional<Object> getHistoriqueByPartie(Long gameId) {
+    public Optional<PartieDetailDTO> getHistoriqueByPartie(Long gameId) {
         return Optional.empty();
     }
 

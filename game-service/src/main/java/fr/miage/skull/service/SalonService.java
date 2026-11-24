@@ -57,11 +57,6 @@ public class SalonService {
         );
     }
 
-    private List<SalonDTO> getSalonsDisponibles (){
-        return salonRepository.findByStatus("EN_ATTENTE").stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
     @Transactional
     public SalonDTO joindreSalon(Long idSalon,Long idJoueur) {
         Salon salon = salonRepository.findById(idSalon).orElseThrow(() -> new SalonNotFoundException(idSalon));

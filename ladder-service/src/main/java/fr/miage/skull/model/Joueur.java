@@ -11,13 +11,13 @@ public class Joueur {
     @Column(nullable=false, unique=true)
     private String email;
     @Column(nullable=false)
-    private int nbVictoires;
+    private long nbVictoires;
     @Column(nullable=false)
-    private int nbParties;
+    private long nbParties;
 
     public Joueur() {}
 
-    public Joueur( String email, int nbVictoires, int nbParties) {
+    public Joueur( String email, long nbVictoires, long nbParties) {
         this.email = email;
         this.nbVictoires = nbVictoires;
         this.nbParties = nbParties;
@@ -39,19 +39,19 @@ public class Joueur {
         this.email = email;
     }
 
-    public int getNbVictoires() {
+    public long getNbVictoires() {
         return nbVictoires;
     }
 
-    public void setNbVictoires(int nbVictoires) {
+    public void setNbVictoires(long nbVictoires) {
         this.nbVictoires = nbVictoires;
     }
 
-    public int getNbParties() {
+    public long getNbParties() {
         return nbParties;
     }
 
-    public void setNbParties(int nbParties) {
+    public void setNbParties(long nbParties) {
         this.nbParties = nbParties;
     }
 }

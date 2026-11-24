@@ -1,9 +1,15 @@
 package fr.miage.skull;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class SalonDTO {
     private Long idSalon;
+    @NotNull
     private Long idCreateur;
+    @Min(1)
     private long nbMaxJoueur;
+    @Min(0)
     private long nbAi;
     private String status;
 
