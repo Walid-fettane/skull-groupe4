@@ -2,6 +2,7 @@ package fr.miage.skull.service;
 
 import fr.miage.skull.JoueurStatsDTO;
 import fr.miage.skull.model.repository.JoueurRepository;
+import io.micrometer.observation.ObservationFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public class LadderService {
     public Optional<Object> getHistoriqueByPartie(Long gameId) {
         return Optional.empty();
     }
+
+
 }

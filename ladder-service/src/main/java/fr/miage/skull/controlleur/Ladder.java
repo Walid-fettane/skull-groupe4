@@ -31,8 +31,10 @@ public class Ladder {
                         .body("Joueur non trouvé avec l'id : "+idJoueur));
     }
     @GetMapping("/historique/games/{gamesid}")
-    public ResponseEntity<Void> getPartieHistory(@PathVariable Long gameid){
-        //TODO
-        return null;
+    public ResponseEntity<?> getGameHistory(@PathVariable Long gameid){
+        return ladderService.getHistoriqueByPartie(gameid) // to add in LadderService, returning Optional<...DTO>
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Partie non trouvée avec l'id : " + gameid));
     }
 }

@@ -2,13 +2,15 @@ package fr.miage.skull.controlleur;
 
 import fr.miage.skull.SalonDTO;
 import fr.miage.skull.service.SalonService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/salons")
 public class SalonController {
 
     private final SalonService salonService;
@@ -17,7 +19,7 @@ public class SalonController {
         this.salonService = salonService;
     }
 
-    @GetMapping("/salons")
+    @GetMapping
     public ResponseEntity<List<SalonDTO>> getAllSalons() {
         List<SalonDTO> salons = salonService.getAllSalons();
         return ResponseEntity.ok(salons);
@@ -29,10 +31,10 @@ public class SalonController {
         return ResponseEntity.ok(salonDTO);
     }
 
-    @PostMapping("/salons")
-    public ResponseEntity<SalonDTO> createSalon(@RequestBody SalonDTO salonDTO) {
+    @PostMapping
+    public ResponseEntity<SalonDTO> createSalon(@Valid @RequestBody SalonDTO salonDTO) {
         SalonDTO createdSalon = salonService.createSalon(salonDTO);
-        return ResponseEntity.ok(createdSalon);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSalon);
     }
 
     @PostMapping("/{id}/joindre")
@@ -40,7 +42,7 @@ public class SalonController {
         return ResponseEntity.ok(salonService.joindreSalon(id,idJoueur));
     }
 
-    @PostMapping("/{id}/quitter")
+    @DeleteMapping("/{id}/quitter")
     public ResponseEntity<?> quitterSalon(@PathVariable Long id, @RequestParam Long idJoueur) {
         boolean remplaceParAI= salonService.quitterSalon(id,idJoueur);
         if(remplaceParAI){
