@@ -1,12 +1,13 @@
 package fr.miage.skull.controlleur;
+import fr.miage.skull.FinPartieDTO;
 import fr.miage.skull.JoueurStatsDTO;
+import fr.miage.skull.PartieDetailDTO;
 import fr.miage.skull.service.LadderService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -24,17 +25,22 @@ public class Ladder {
         return ResponseEntity.ok(leaderboard);
     }
     @GetMapping("/historique/{joueurId}")
-    public ResponseEntity <?> getPlayerHistory(@PathVariable Long idJoueur) {
-        return ladderService.getHistoriqueByJoueur(idJoueur)
+    public ResponseEntity <?> getPlayerHistory(@PathVariable Long joueurId) {
+        return ladderService.getHistoriqueByJoueur(joueurId)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Joueur non trouvé avec l'id : "+idJoueur));
+                        .body("Joueur non trouvé avec l'id : "+joueurId));
     }
     @GetMapping("/historique/games/{gamesid}")
-    public ResponseEntity<?> getGameHistory(@PathVariable Long gameid){
-        return ladderService.getHistoriqueByPartie(gameid)
+    public ResponseEntity<?> getGameHistory(@PathVariable Long gamesid){
+        return ladderService.getHistoriqueByPartie(gamesid)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Partie non trouvée avec l'id : " + gameid));
+                        .body("Partie non trouvée avec l'id : " + gamesid));
+    }
+    @PostMapping("/historique/games")
+    public ResponseEntity<PartieDetailDTO> enregistrerFinPartie(@Valid @RequestBody FinPartieDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ladderService.enregistrerFinPartie(dto));
     }
 }

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ParticipationRepository  extends JpaRepository<Participation, ParticipationId> {
-    List<Participation> findByJoueurAndIdJoueurOrderByPartieAndDateFinDesc(Long idJoueur);
+    List<Participation> findByJoueur_IdJoueurOrderByPartie_DateFinDesc(Long idJoueur);
 }

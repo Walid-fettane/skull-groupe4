@@ -1,5 +1,6 @@
 package fr.miage.skull;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -7,7 +8,7 @@ public class SalonDTO {
     private Long idSalon;
     @NotNull
     private Long idCreateur;
-    @Min(1)
+    @Min(3) @Max(6)
     private long nbMaxJoueur;
     @Min(0)
     private long nbAi;

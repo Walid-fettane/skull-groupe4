@@ -1,4 +1,4 @@
-package fr.miage.skull.model.repos;
+package fr.miage.skull.model.repository;
 
 import fr.miage.skull.model.Salon;
 import org.springframework.data.jpa.repository.JpaRepository;

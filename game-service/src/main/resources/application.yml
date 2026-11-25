@@ -1,6 +1,18 @@
 spring:
   application:
     name: game-service
+  datasource:
+    url: jdbc:sqlite:C:/Users/Utilisateur/skull-groupe4/db/database.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
 
 server:
   port: 8082

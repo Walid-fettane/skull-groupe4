@@ -27,3 +27,8 @@ Pour chaque lot, on rendra une description de ce qu'on a fait, un plan de tests 
 ## Base de données
 
 La structure de la base de données (version 1) est disponible dans le fichier [database.sql]
+Assurez vous que la base de données est bien crée.
+Test effectués afin de confirmé que les données de la base de données sont corrects:
+http://localhost:8083/api/v1/ladder
+http://localhost:8083/api/v1/historique/1
+http://localhost:8083/api/v1/historique/games/1

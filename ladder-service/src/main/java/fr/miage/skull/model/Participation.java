@@ -20,6 +20,16 @@ public class Participation {
     private int score;
     @Column(name = "est_gagnant")
     private boolean vainqueur;
+    @Column(name = "nbtuillesRestantes")
+    private int tuilesRestantes;
+
+    public void setTuilesRestantes(int tuilesRestantes) {
+        this.tuilesRestantes = tuilesRestantes;
+    }
+
+    public int getTuilesRestantes() {
+        return tuilesRestantes;
+    }
 
     public Participation() {}
 

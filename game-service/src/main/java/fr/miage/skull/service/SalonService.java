@@ -3,12 +3,11 @@ package fr.miage.skull.service;
 import fr.miage.skull.SalonDTO;
 import fr.miage.skull.exception.SalonNotFoundException;
 import fr.miage.skull.model.Salon;
-import fr.miage.skull.model.repos.SalonRepository;
+import fr.miage.skull.model.repository.SalonRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SalonService {
@@ -21,11 +20,11 @@ public class SalonService {
     }
     @Transactional(readOnly = true)
     public List<SalonDTO> getAllSalons() {
-        return salonRepository.findAll().stream()
+        return salonRepository.findByStatus(EN_ATTENTE).stream()
                 .map(this::convertToDTO)
                 .toList();
     }
-    @Transactional
+    @Transactional(readOnly = true)
     public SalonDTO getSalonById(Long id) {
         Salon salon = salonRepository.findById(id)
                 .orElseThrow(() -> new SalonNotFoundException(id));
@@ -40,7 +39,7 @@ public class SalonService {
                 salonDTO.getIdCreateur(),
                 salonDTO.getNbMaxJoueur(),
                 salonDTO.getNbAi(),
-                salonDTO.getStatus()
+                EN_ATTENTE
         );
         salon.getJoueurIds().add(salonDTO.getIdCreateur());
         Salon savedSalon = salonRepository.save(salon);
@@ -60,7 +59,7 @@ public class SalonService {
     @Transactional
     public SalonDTO joindreSalon(Long idSalon,Long idJoueur) {
         Salon salon = salonRepository.findById(idSalon).orElseThrow(() -> new SalonNotFoundException(idSalon));
-        if(EN_ATTENTE.equals(salon.getStatus())) {
+        if(!EN_ATTENTE.equals(salon.getStatus())) {
             throw new IllegalStateException("Ce salon est rempli et n'accepte plus de joueurs");
         }
         if(salon.getJoueurIds().contains(idJoueur)) {

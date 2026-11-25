@@ -18,7 +18,17 @@ public class Partie{
     private LocalDateTime dateFin;
     @OneToMany(mappedBy = "partie", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Participation> participations = new ArrayList<>();
+    @Column(name = "gameServiceId")
+    private Long gameServiceId;
     public Partie(){}
+
+    public Long getGameServiceId() {
+        return gameServiceId;
+    }
+
+    public void setGameServiceId(Long gameServiceId) {
+        this.gameServiceId = gameServiceId;
+    }
 
     public Long getIdPartie() {
         return idPartie;
