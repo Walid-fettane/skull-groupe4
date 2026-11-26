@@ -1,0 +1,16 @@
+
+### 1. Créer un salon avec le minimum requis (max 3 joueurs, 1 IA)
+### objectif de tester que lorsuqe le salon est rempli, personne puisse joindre apres
+POST http://localhost:8082/api/v1/salons
+Content-Type: application/json
+
+{"idCreateur": 1, "nbMaxJoueur": 3, "nbAi": 1}
+
+### 2. Le joueur 2 deja present
+POST http://localhost:8082/api/v1/salons/3/joindre?idJoueur=1
+
+### 3. Tenter de faire rejoindre le joueur 2
+POST http://localhost:8082/api/v1/salons/3/joindre?idJoueur=2
+
+### 4. Vérifier la liste des salons disponibles(normalement 1 seul en cours)
+GET http://localhost:8082/api/v1/salons

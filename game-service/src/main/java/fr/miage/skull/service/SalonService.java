@@ -69,6 +69,10 @@ public class SalonService {
             throw new IllegalStateException("Ce salon est plein, essayez un autre");
         }
         salon.getJoueurIds().add(idJoueur);
+        if (salon.estPlein()) {
+            salon.setStatus("PLEIN");
+        }
+
         return convertToDTO(salonRepository.save(salon));
     }
     @Transactional
