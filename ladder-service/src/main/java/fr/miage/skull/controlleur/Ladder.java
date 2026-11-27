@@ -1,4 +1,5 @@
 package fr.miage.skull.controlleur;
+
 import fr.miage.skull.FinPartieDTO;
 import fr.miage.skull.JoueurStatsDTO;
 import fr.miage.skull.PartieDetailDTO;

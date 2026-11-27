@@ -15,6 +15,11 @@ public class JoueurIA extends AbstractJoueur {
         super(id, username);
     }
 
+    @Override
+    public boolean estIA() {
+        return true;
+    }
+
     public CoupDTO genererCoup(Phase phase, int enchereCourrante, Map<Integer, Long> otherPlayerNbDisquePileAssoc){
         switch(phase){
             case Phase.PLACEMENT -> {

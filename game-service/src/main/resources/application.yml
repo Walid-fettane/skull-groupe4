@@ -2,7 +2,7 @@ spring:
   application:
     name: game-service
   datasource:
-    url: jdbc:sqlite:C:/Users/Utilisateur/skull-groupe4/db/database.db
+    url: jdbc:sqlite:${SKULL_DB_PATH:db/database.db}
     driver-class-name: org.sqlite.JDBC
   jpa:
     show-sql: true
@@ -16,3 +16,7 @@ spring:
 
 server:
   port: 8082
+
+skull:
+  ladder-service:
+    url: ${SKULL_LADDER_URL:http://localhost:8083}

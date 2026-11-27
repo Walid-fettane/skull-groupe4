@@ -16,6 +16,7 @@ public class GameCreation {
 
     private static final int NB_JOUEURS_MIN = 3;
     private static final int NB_JOUEURS_MAX = 6;
+    private static final int ID_PREMIERE_IA = 1000000;
 
     private final AtomicInteger sequenceIA = new AtomicInteger();
 
@@ -35,7 +36,7 @@ public class GameCreation {
 
     public IJoueur createIA() {
         int numero = sequenceIA.incrementAndGet();
-        return new JoueurIA(-numero, "IA " + numero);
+        return new JoueurIA(ID_PREMIERE_IA + numero, "IA " + numero);
     }
 
     private void validerConfiguration(int nbJoueursMax, int nbIA) throws ConfigurationPartieInvalideException {

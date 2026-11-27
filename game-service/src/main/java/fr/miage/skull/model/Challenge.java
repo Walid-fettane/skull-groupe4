@@ -42,6 +42,7 @@ public class Challenge {
             if(hasSkull){
                 //Si le joueur à retourné un skull dans sa pile, alors il perd le challenge
                 finChallenge(false, challenger.getId());
+                return;
             } else {
                 nbFleurRevele +=challenger.getNbDisquePile();
             }
@@ -66,7 +67,7 @@ public class Challenge {
                 .findFirst()
                 .orElseThrow(JoueurNonDansPartieException::new);
 
-        if(joueur.getNbDisquePile()==0){
+        if(joueur.getNbDisquesPilePasRevele()==0){
             throw new RevelationInvalideException();
         }
 

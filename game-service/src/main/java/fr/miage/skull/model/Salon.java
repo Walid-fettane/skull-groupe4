@@ -16,6 +16,7 @@ public class Salon {
     private long nbMaxJoueur;
     private long nbAi;
     private String status;
+    private Long idGame;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "salon_joueurs", joinColumns = @JoinColumn(name = "id_salon"))
     @Column(name = "id_joueur")
@@ -68,6 +69,13 @@ public class Salon {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Long getIdGame() {
+        return idGame;
+    }
+
+    public void setIdGame(Long idGame) {
+        this.idGame = idGame;
     }
     public Set<Long> getJoueurIds() { return joueurIds; }
     public boolean estPlein() {

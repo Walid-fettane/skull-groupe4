@@ -22,6 +22,9 @@ public record GameStateDTO(
         long coupNumero,
 
         @PositiveOrZero
+        int idJoueurCourant,
+
+        @PositiveOrZero
         int enchereEnCours,
 
         @NotNull
@@ -32,5 +35,8 @@ public record GameStateDTO(
         DisqueFinChallengeDTO dFinChallengeDTO,
 
         @NotNull
-        List<@Valid PlayerGameDTO> playerGames) {
+        List<@Valid PlayerGameDTO> playerGames,
+
+        @Nullable
+        Integer vainqueurId) {
 }

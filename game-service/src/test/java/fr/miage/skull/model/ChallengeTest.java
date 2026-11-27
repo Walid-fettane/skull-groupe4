@@ -150,7 +150,7 @@ class ChallengeTest {
         when(bob.getId()).thenReturn(BOB);
         when(alice.revelerTouteSaPile()).thenReturn(false);
         when(alice.getNbDisquePile()).thenReturn(1);
-        when(bob.getNbDisquePile()).thenReturn(0);
+        when(bob.getNbDisquesPilePasRevele()).thenReturn(0L);
         Challenge challenge = spy(new Challenge(ALICE, 3, CHALLENGE_ID, List.of(alice, bob), tour));
         challenge.revelerSaPile();
 
@@ -165,7 +165,7 @@ class ChallengeTest {
         when(bob.getId()).thenReturn(BOB);
         when(alice.revelerTouteSaPile()).thenReturn(false);
         when(alice.getNbDisquePile()).thenReturn(1);
-        when(bob.getNbDisquePile()).thenReturn(1);
+        when(bob.getNbDisquesPilePasRevele()).thenReturn(1L);
         when(bob.revelerDisque()).thenReturn(DisqueType.SKULL);
         Challenge challenge = spy(new Challenge(ALICE, 3, CHALLENGE_ID, List.of(alice, bob), tour));
         challenge.revelerSaPile();
@@ -181,7 +181,7 @@ class ChallengeTest {
         when(bob.getId()).thenReturn(BOB);
         when(alice.revelerTouteSaPile()).thenReturn(false);
         when(alice.getNbDisquePile()).thenReturn(1);
-        when(bob.getNbDisquePile()).thenReturn(1);
+        when(bob.getNbDisquesPilePasRevele()).thenReturn(1L);
         when(bob.revelerDisque()).thenReturn(DisqueType.FLEUR);
         Challenge challenge = spy(new Challenge(ALICE, 3, CHALLENGE_ID, List.of(alice, bob), tour));
         challenge.revelerSaPile();
@@ -197,7 +197,7 @@ class ChallengeTest {
         when(bob.getId()).thenReturn(BOB);
         when(alice.revelerTouteSaPile()).thenReturn(false);
         when(alice.getNbDisquePile()).thenReturn(1);
-        when(bob.getNbDisquePile()).thenReturn(1);
+        when(bob.getNbDisquesPilePasRevele()).thenReturn(1L);
         when(bob.revelerDisque()).thenReturn(DisqueType.FLEUR);
         Challenge challenge = spy(new Challenge(ALICE, 2, CHALLENGE_ID, List.of(alice, bob), tour));
         challenge.revelerSaPile();

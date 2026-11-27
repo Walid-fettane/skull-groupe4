@@ -18,6 +18,8 @@ public interface IJoueur {
 
     boolean estElimine();
 
+    boolean estIA();
+
     DisqueMain getDisqueMain();
 
     DisquePile getDisquePile();

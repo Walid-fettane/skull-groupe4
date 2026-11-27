@@ -1,6 +1,7 @@
 package fr.miage.skull.model;
 
 import fr.miage.skull.DisqueType;
+import fr.miage.skull.exception.RevelationInvalideException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +21,13 @@ public class DisquePile {
     }
 
     public DisqueType revelerPremierDisque() {
-        nbDisque--;
-        return disques.remove(nbDisque).getType();
+        Disque disque = this.disques.entrySet().stream()
+                .filter(x -> x.getValue().estPasRevele())
+                .max(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .orElseThrow(RevelationInvalideException::new);
+        disque.setRevele(true);
+        return disque.getType();
     }
 
     public void reinitialiserPile() {

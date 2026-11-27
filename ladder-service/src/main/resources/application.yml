@@ -2,7 +2,7 @@ spring:
   application:
     name: ladder-service
   datasource:
-      url: jdbc:sqlite:C:/Users/Utilisateur/skull-groupe4/db/database.db
+      url: jdbc:sqlite:${SKULL_DB_PATH:db/database.db}
       driver-class-name: org.sqlite.JDBC
   jpa:
     show-sql: true

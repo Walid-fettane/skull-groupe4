@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Game {
+
+    private static final int MAX_COUPS_IA = 100;
 
     private long id;
     private GameStatus status;
@@ -31,6 +34,7 @@ public class Game {
     private DisqueFinChallenge dFinChallenge;
     private final int nbJoueursMax;
     private int vainqueurId = -1;
+    private Long idSalon;
 
     //tableau des ids des joueurs ayant passé l'enchère dans le tour courrant
     private List<Integer> playerIdEncherePasse;
@@ -66,15 +70,17 @@ public class Game {
         this.validerDebutPartie();
         this.status = GameStatus.EN_COURS;
         this.coupNumero = 0;
-        this.idJoueurCourant = listeJoueurs.getFirst().getId();
         this.initTour();
         this.playerIdEncherePasse = new ArrayList<>();
+        this.setJoueurCourant(listeJoueurs.getFirst().getId());
+        this.jouerCoupsIA();
     }
 
     public void jouerCoup(CoupDTO coup, int playerId) throws JoueurElimineException {
         valideJoueur(playerId);
         if(tour != null){
             tour.jouerCoup(playerId, coup);
+            jouerCoupsIA();
         }
     }
 
@@ -128,19 +134,30 @@ public class Game {
     }
 
     public void finSuppressionDisque(){
-        this.commencerNouveauTour();
+        this.commencerNouveauTour(this.dFinChallenge.getDisqueOwner());
     }
 
-    private void commencerNouveauTour() {
+    private void commencerNouveauTour(int premierJoueurId) {
         //On met tour à null pour éviter les coup de s'éxecuter ou autre problèmes..
         this.tour = null;
         this.playerIdEncherePasse = null;
+        this.dFinChallenge = null;
         for(IJoueur unJoueur : this.listeJoueurs){
-            unJoueur.resetElimination();
             unJoueur.recupererDisque();
+            unJoueur.resetElimination();
+            if(unJoueur.getNbDisquesMain()==0){
+                unJoueur.setElimine(true);
+            }
+        }
+        if(finirJeuSiPlusAssezDeJoueurs()){
+            return;
         }
         this.tour = new Tour(++this.tourId, this);
         this.playerIdEncherePasse = new ArrayList<>();
+        this.setJoueurCourant(premierJoueurId);
+        if(!peutJouer(getJoueurCourant())){
+            this.prochainJoueur();
+        }
     }
 
     //@param skullRetourneJoueurId = Le joueur à qui la skull s'est fait retourné si le challenge est perdu..
@@ -150,22 +167,39 @@ public class Game {
             joueur.ajouterVictoire();
             if(joueur.getNbVictoire() == 2){
                 finirJeu(joueur.getId());
+                return;
             }
+            this.commencerNouveauTour(challengerId);
         } else {
             //Si le challenge est perdu
             //On incrémente le coupNumero pour signifier au client qu'il faut jouer
             //Le joueur qui doit jouer est celui qui à retourné le skull, si c'est le challenger, la logique est la même
             this.coupNumero++;
-            this.indexJoueurCourant = skullRetourneJoueurId;
             joueur.recupererDisque();
             this.dFinChallenge=new DisqueFinChallenge(joueur.getDisqueMain().getDisques(), challengerId);
             this.tour.setPhase(Phase.FIN_CHALLENGE);
+            this.setJoueurCourant(skullRetourneJoueurId);
         }
+    }
+
+    private boolean finirJeuSiPlusAssezDeJoueurs(){
+        List<IJoueur> joueursAvecDisques = this.listeJoueurs.stream()
+                .filter(joueur -> joueur.getNbDisquesMain() > 0)
+                .toList();
+        if(joueursAvecDisques.size() > 1){
+            return false;
+        }
+        finirJeu(joueursAvecDisques.isEmpty() ? -1 : joueursAvecDisques.getFirst().getId());
+        return true;
     }
 
     public void finirJeu(int vainqueurId) {
         this.setGagnant(vainqueurId);
         this.status = GameStatus.TERMINE;
+    }
+
+    public int getVainqueurId() {
+        return this.vainqueurId;
     }
 
     public List<IJoueur> getJoueursActif() {
@@ -184,11 +218,33 @@ public class Game {
                 this.getStatus(),
                 phase,
                 this.getCoupNumero(),
+                this.getIdJoueurCourant(),
                 enchereEnCours,
                 getDisquesDTO(playerId),
                 Mapper.disqueFinChallengeToDTO(this.getdFinChallenge(), playerId),
-                getPlayersDTO(playerId)
+                getPlayersDTO(playerId),
+                this.vainqueurId == -1 ? null : this.vainqueurId
         );
+    }
+
+    public Long getIdSalon() {
+        return idSalon;
+    }
+
+    public void setIdSalon(Long idSalon) {
+        this.idSalon = idSalon;
+    }
+
+    public FinPartieDTO getFinPartieDTO() {
+        List<ParticipantDTO> participants = this.listeJoueurs.stream()
+                .filter(joueur -> !joueur.estIA())
+                .map(joueur -> new ParticipantDTO(
+                        (long) joueur.getId(),
+                        joueur.getNbVictoire(),
+                        joueur.getNbDisquesMain() + joueur.getNbDisquePile(),
+                        joueur.getId() == this.vainqueurId))
+                .toList();
+        return new FinPartieDTO(this.id, this.idSalon, participants);
     }
 
     public void setGagnant(int playerId) {
@@ -209,12 +265,9 @@ public class Game {
 
     public void prochainJoueur() {
         this.coupNumero++;
-        this.indexJoueurCourant = (this.indexJoueurCourant + 1) % this.listeJoueurs.size();
-        IJoueur prochainJoueur =  this.listeJoueurs.get(this.indexJoueurCourant);
-        this.idJoueurCourant = prochainJoueur.getId();
-        if(prochainJoueur instanceof JoueurIA){
-            //Si le prochain joueur est instance de JoueurIA donc s'il est une IA, on demande de trouver un coup
-            trouverCoup((JoueurIA) prochainJoueur);
+
+        if(this.tour.getPhase()==Phase.REVELATION){
+            return;
         }
 
         //Si c'est une phase d'enchere
@@ -222,31 +275,88 @@ public class Game {
             //On prend le nombre de joueurs non elimine qu'on compare au nombre d'id dans la liste de joueur qui ont passé
             //Si un seul joueur n'a pas passé, alors le challenge peut commencer
             if((this.getNbPlayerNonElimine()-this.getListIdPlayerPasserEnchere().size())==1){
-                //On cherche le joueur non éliminé qui à son id dans listeJoueur mais pas dans playerIdEncherePasse
-                //AKA note challengeur
-                int playerIdChallenge = listeJoueurs.stream()
-                        .filter(joueur -> !joueur.estElimine())
-                        .map(IJoueur::getId)
-                        .filter(id -> !playerIdEncherePasse.contains(id))
-                        .findFirst()
-                        .orElseThrow();
+                int playerIdChallenge = trouverChallengerId();
                 //On indique à l'objet du tour que le challenge peut commencer avec le challenger en id
                 this.tour.commencerChallenge(playerIdChallenge);
+                this.setJoueurCourant(playerIdChallenge);
+                return;
             }
-            if(this.playerIdEncherePasse.contains(prochainJoueur.getId())){
+        }
+
+        this.setJoueurCourant(prochainJoueurJouable().getId());
+    }
+
+    //On cherche le joueur non éliminé qui à son id dans listeJoueur mais pas dans playerIdEncherePasse
+    //AKA note challengeur
+    private int trouverChallengerId(){
+        return this.listeJoueurs.stream()
+                .filter(joueur -> !joueur.estElimine())
+                .map(IJoueur::getId)
+                .filter(id -> !this.playerIdEncherePasse.contains(id))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private IJoueur prochainJoueurJouable(){
+        int index = this.indexJoueurCourant;
+        for(int i = 0; i < this.listeJoueurs.size(); i++){
+            index = (index + 1) % this.listeJoueurs.size();
+            IJoueur joueur = this.listeJoueurs.get(index);
+            if(peutJouer(joueur)){
+                return joueur;
+            }
+        }
+        return getJoueurCourant();
+    }
+
+    private boolean peutJouer(IJoueur joueur){
+        if(joueur.estElimine()){
+            return false;
+        }
+        return !(this.tour.getPhase()==Phase.ENCHERE && this.playerIdEncherePasse.contains(joueur.getId()));
+    }
+
+    private void setJoueurCourant(int playerId){
+        this.indexJoueurCourant = indexDuJoueur(playerId);
+        this.idJoueurCourant = playerId;
+    }
+
+    private int indexDuJoueur(int playerId){
+        return IntStream.range(0, this.listeJoueurs.size())
+                .filter(index -> this.listeJoueurs.get(index).getId()==playerId)
+                .findFirst()
+                .orElseThrow(JoueurNonDansPartieException::new);
+    }
+
+    private IJoueur getJoueurCourant(){
+        return this.listeJoueurs.get(this.indexJoueurCourant);
+    }
+
+    private void jouerCoupsIA(){
+        int nbCoupsIA = 0;
+        while(this.status==GameStatus.EN_COURS && this.tour!=null && nbCoupsIA < MAX_COUPS_IA
+                && getJoueurCourant() instanceof JoueurIA ia){
+            jouerCoupIA(ia);
+            nbCoupsIA++;
+        }
+    }
+
+    private void jouerCoupIA(JoueurIA ia){
+        try {
+            //On joue un coup trouvé par l'IA
+            this.tour.jouerCoup(ia.getId(), genererCoupIA(ia));
+        } catch (RuntimeException e){
+            if(this.tour.getPhase()==Phase.ENCHERE){
+                this.tour.encherePasse(ia.getId());
+            } else {
                 prochainJoueur();
             }
         }
     }
 
-    public void trouverCoup(JoueurIA ai){
-        try {
-            //On joue un coup trouvé par l'IA
-            jouerCoup(ai.genererCoup(tour.getPhase(), this.tour.getEnchereEnCours(), this.getListeJoueurs().stream().collect(Collectors.toMap(IJoueur::getId, IJoueur::getNbDisquesPilePasRevele))), this.idJoueurCourant);
-        } catch (JoueurElimineException e){
-            //Si l'IA est éliminé, alors, on passe au prochain joueur
-            prochainJoueur();
-        }
+    private CoupDTO genererCoupIA(JoueurIA ia){
+        return ia.genererCoup(this.tour.getPhase(), this.tour.getEnchereEnCours(),
+                this.listeJoueurs.stream().collect(Collectors.toMap(IJoueur::getId, IJoueur::getNbDisquesPilePasRevele)));
     }
 
 

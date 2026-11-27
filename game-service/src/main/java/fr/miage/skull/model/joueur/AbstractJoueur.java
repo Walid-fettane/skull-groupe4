@@ -40,6 +40,11 @@ public class AbstractJoueur implements IJoueur {
         return disqueMain.possedeType(type);
     }
 
+    @Override
+    public boolean estIA() {
+        return false;
+    }
+
     //Si le joueur n'a plus de disque, et que c'est à son tour de jouer, il doit pariter
     public boolean doitParier() {
         return this.disqueMain.estVide();
@@ -99,6 +104,7 @@ public class AbstractJoueur implements IJoueur {
     @Override
     public void recupererDisque() {
         for(Disque unDisque : this.disquePile.getDisques().values()){
+            unDisque.setRevele(false);
             this.disqueMain.ajouterDisque(unDisque);
         }
         this.disquePile.reinitialiserPile();

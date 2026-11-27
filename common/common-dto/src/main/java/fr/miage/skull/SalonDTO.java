@@ -13,6 +13,7 @@ public class SalonDTO {
     @Min(0)
     private long nbAi;
     private String status;
+    private Long idGame;
 
     public SalonDTO(Long idSalon, Long idCreateur, long nbMaxJoueur, long nbAi, String status) {
         this.idSalon = idSalon;
@@ -38,6 +39,12 @@ public class SalonDTO {
     }
     public String getStatus() {
         return status;
+    }
+    public Long getIdGame() {
+        return idGame;
+    }
+    public void setIdGame(Long idGame) {
+        this.idGame = idGame;
     }
 
 

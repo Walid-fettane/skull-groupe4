@@ -53,11 +53,12 @@ public class Tour {
     }
 
     public void enleverDisque(int playerId, int slot){
-        IJoueur joueur = this.gameAssocTour.getJoueurParId(playerId);
-        Disque disque = this.gameAssocTour.getdFinChallenge().getDisquePosition().get(slot);
+        DisqueFinChallenge disqueFinChallenge = this.gameAssocTour.getdFinChallenge();
+        Disque disque = disqueFinChallenge.getDisquePosition().get(slot);
         if(disque == null){
             throw new DisqueIndisponibleException();
         }
+        IJoueur joueur = this.gameAssocTour.getJoueurParId(disqueFinChallenge.getDisqueOwner());
         joueur.supprimerDisque(disque.getType());
         this.gameAssocTour.finSuppressionDisque();
     }
@@ -111,12 +112,18 @@ public class Tour {
         //Si le joueur veut se révèler lui-même alors il révèle sa pile
         if(playerId==playerTargetId){
             this.challenge.revelerSaPile();
-            return;
+        } else {
+            //Le joueur révèle un autre joueur
+            this.challenge.revelerLePremierDisque(playerTargetId);
         }
 
-        //Le joueur révèle un autre joueur
-        this.challenge.revelerLePremierDisque(playerTargetId);
-        this.prochainJoueur();
+        if(challengeEnCours()){
+            this.prochainJoueur();
+        }
+    }
+
+    public boolean challengeEnCours(){
+        return this.gameAssocTour.getTour()==this && this.phase==Phase.REVELATION;
     }
 
     // On valide que le coup qu'il joue est valide avec le status de la partie

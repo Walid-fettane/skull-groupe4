@@ -2,6 +2,7 @@ package fr.miage.skull.service;
 
 import fr.miage.skull.CoupDTO;
 import fr.miage.skull.GameStateDTO;
+import fr.miage.skull.GameStatus;
 import fr.miage.skull.SignalementDTO;
 import fr.miage.skull.exception.AutoSignalementException;
 import fr.miage.skull.exception.ConfigurationPartieInvalideException;
@@ -12,11 +13,11 @@ import fr.miage.skull.exception.JoueurNonDansPartieException;
 import fr.miage.skull.exception.SignalementIAException;
 import fr.miage.skull.model.Game;
 import fr.miage.skull.model.joueur.IJoueur;
-import fr.miage.skull.model.joueur.Joueur;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,26 +25,36 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GameEngineService {
 
     private final Map<Long, Game> games = new ConcurrentHashMap<>();
+    private final Set<Long> partiesEnregistrees = ConcurrentHashMap.newKeySet();
     private final AtomicLong sequenceGame = new AtomicLong();
     private final GameCreation gameCreation;
+    private final LadderClient ladderClient;
 
-    public GameEngineService(GameCreation gameCreation) {
+    public GameEngineService(GameCreation gameCreation, LadderClient ladderClient) {
         this.gameCreation = gameCreation;
+        this.ladderClient = ladderClient;
     }
 
     public GameStateDTO creerPartie(int playerId, String username, long skinId, int nbJoueursMax, int nbIA)
+            throws ConfigurationPartieInvalideException, DebutDeLaPartieImpossibleException {
+        return creerPartie(playerId, username, skinId, nbJoueursMax, nbIA, null);
+    }
+
+    public GameStateDTO creerPartie(int playerId, String username, long skinId, int nbJoueursMax, int nbIA, Long idSalon)
             throws ConfigurationPartieInvalideException, DebutDeLaPartieImpossibleException {
         //On créé un joueur (le créateur de la partie)
         IJoueur createur = gameCreation.createPlayer(playerId, username, skinId);
         //On créé une partie en passant le créateur, un nb joueur max et un nombre d'IA souhaité
         Game game = gameCreation.createGame(createur, nbJoueursMax, nbIA);
         game.setId(sequenceGame.incrementAndGet());
+        game.setIdSalon(idSalon);
         //On l'ajoute dans la mémoire
         games.put(game.getId(), game);
         //Si la partie est complète (un seul joueurs + seulement des IA) alors la partie peu commencer
         if (game.estComplete()) {
             game.commencerJeu();
         }
+        enregistrerSiPartieTerminee(game);
         //On envoi l'état de la partie au créateur
         return game.getEtatPourJoueurId(playerId);
     }
@@ -58,6 +69,7 @@ public class GameEngineService {
             //Si la partie devient complète alors on peut lancer le jeu
             game.commencerJeu();
         }
+        enregistrerSiPartieTerminee(game);
         //On envoi le nouvel état au joueur ayant rejoint la partie
         return game.getEtatPourJoueurId(playerId);
     }
@@ -81,6 +93,7 @@ public class GameEngineService {
         }
         //Si la partie est trouvé, on joue le coup, puis on renvoie le nouvel état de la partie
         game.get().jouerCoup(coup, playerId);
+        enregistrerSiPartieTerminee(game.get());
         return game.get().getEtatPourJoueurId(playerId);
     }
 
@@ -105,11 +118,21 @@ public class GameEngineService {
         if(joueurTarget == null){
             throw new JoueurNonDansPartieException();
         }
-        if(!(joueurTarget instanceof Joueur)){
+        if(joueurTarget.estIA()){
             throw new SignalementIAException();
         }
 
         //Appel service signalement
+    }
+
+    private void enregistrerSiPartieTerminee(Game game) {
+        if (game.getStatus() != GameStatus.TERMINE || game.getIdSalon() == null) {
+            return;
+        }
+        if (!partiesEnregistrees.add(game.getId())) {
+            return;
+        }
+        ladderClient.enregistrerFinPartie(game.getFinPartieDTO());
     }
 
     private Game trouverPartie(long gameId) throws GameNotFoundException {

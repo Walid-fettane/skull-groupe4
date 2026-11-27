@@ -39,10 +39,12 @@ class EnchereTest {
 
     @Test
     void encherirAvecLIdDeLEncherisseurCourantEstInvalide() {
+        enchere.encherir(ALICE, 2);
+
         assertThatExceptionOfType(EnchereInvalideException.class)
-                .isThrownBy(() -> enchere.encherir(-1, 2));
-        assertThat(enchere.getCurrentEnchere()).isZero();
-        assertThat(enchere.getWinnerId()).isEqualTo(-1);
+                .isThrownBy(() -> enchere.encherir(ALICE, 3));
+        assertThat(enchere.getCurrentEnchere()).isEqualTo(2);
+        assertThat(enchere.getWinnerId()).isEqualTo(ALICE);
     }
 
     @Test
